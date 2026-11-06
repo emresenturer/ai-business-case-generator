@@ -1,0 +1,672 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Business Case Generator</title>
+<meta name="description" content="Turn a product idea into a structured business case: problem, market sizing method, competition, business models, costs, risks, KPIs, a 90-day plan, and a clear recommendation.">
+<meta property="og:title" content="AI Business Case Generator">
+<meta property="og:description" content="Transform a product idea into a structured, honest business case with labeled assumptions. Export to Markdown or PDF.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://emresenturer.github.io/ai-business-case-generator/">
+<meta name="twitter:card" content="summary">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap">
+<style>
+:root {
+  --bg: #f6f7f9;
+  --card: #ffffff;
+  --ink: #141a24;
+  --ink-2: #3d4757;
+  --muted: #677285;
+  --line: #e0e4ea;
+  --soft: #f0f2f6;
+  --accent: #2f4fd8;
+  --accent-ink: #ffffff;
+  --accent-soft: #e8edff;
+  --go: #1f7a4d; --go-soft: #e3f4ea;
+  --test: #9a6400; --test-soft: #fbf0d9;
+  --nogo: #b23a32; --nogo-soft: #fbe5e2;
+  --shadow: 0 1px 2px rgba(16, 24, 40, .05), 0 6px 20px rgba(16, 24, 40, .05);
+  --sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --serif: "Source Serif 4", Georgia, serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f131a; --card: #161b24; --ink: #e7eaf0; --ink-2: #bcc3cf; --muted: #8b95a6;
+    --line: #283041; --soft: #1c2230; --accent: #8ea2ff; --accent-ink: #0f131a; --accent-soft: #1f2846;
+    --go: #6fd3a0; --go-soft: #14301f; --test: #f1c46b; --test-soft: #352a12; --nogo: #f39a91; --nogo-soft: #3a1c1a;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--ink); font: 16px/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
+a { color: var(--accent); }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 16px; }
+header.site { padding: 36px 0 4px; }
+.eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+h1 { font-family: var(--serif); font-size: clamp(30px, 4.6vw, 46px); line-height: 1.12; margin: 10px 0; letter-spacing: -.01em; }
+.lede { color: var(--ink-2); font-size: 18px; margin: 0; max-width: 700px; }
+main { padding: 22px 0 48px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); padding: 20px; min-width: 0; }
+.form-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px 18px; }
+@media (min-width: 820px) { .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .span-2 { grid-column: span 2; } }
+label, legend { display: block; font-weight: 600; font-size: 14px; margin: 0 0 6px; padding: 0; }
+.opt { font-weight: 400; color: var(--muted); }
+textarea, input[type=text], input[type=password], select {
+  width: 100%; font: inherit; font-size: 15px; color: var(--ink); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 9px; padding: 9px 11px;
+}
+textarea { min-height: 84px; resize: vertical; }
+textarea#idea { min-height: 96px; }
+:focus-visible, textarea:focus, input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: 2px; }
+fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+.seg { display: flex; flex-wrap: wrap; gap: 8px; }
+.seg label { position: relative; margin: 0; font-weight: 500; }
+.seg input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.seg span { display: block; padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--bg); cursor: pointer; font-size: 14px; }
+.seg input:checked + span { background: var(--accent-soft); border-color: var(--accent); color: var(--ink); }
+.seg input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+.nums { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+@media (min-width: 560px) { .nums { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+button { font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; border-radius: 9px; border: 1px solid var(--line); background: var(--card); color: var(--ink); padding: 9px 14px; }
+button:hover { border-color: var(--accent); }
+button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; padding: 11px 18px; font-size: 15px; }
+button:disabled { opacity: .55; cursor: not-allowed; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 16px; }
+.status { color: var(--muted); font-size: 14px; min-height: 1.4em; margin: 10px 0 0; }
+details.key { border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; margin-bottom: 16px; background: var(--soft); }
+details.key summary { cursor: pointer; font-weight: 600; font-size: 14px; display: flex; justify-content: space-between; gap: 8px; list-style: none; }
+details.key summary::-webkit-details-marker { display: none; }
+.keystate { color: var(--muted); font-weight: 500; font-size: 13px; }
+.keystate.on { color: var(--go); }
+.keyrow { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.keyrow input { flex: 1 1 220px; }
+.small-note { font-size: 13px; color: var(--muted); margin: 8px 0 0; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+
+#output { margin-top: 22px; }
+.empty { text-align: center; color: var(--muted); padding: 36px 16px; }
+.empty h2 { font-family: var(--serif); color: var(--ink-2); margin: 0 0 6px; font-size: 22px; }
+.chips-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-top: 12px; padding: 0; list-style: none; }
+.chips-list li { font-size: 13px; padding: 4px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--soft); }
+.loading { text-align: center; padding: 40px 16px; color: var(--ink-2); }
+.spinner { width: 34px; height: 34px; border-radius: 50%; border: 3px solid var(--line); border-top-color: var(--accent); margin: 0 auto 12px; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 3s; } }
+.error { border: 1px solid var(--nogo); background: var(--nogo-soft); border-radius: 12px; padding: 14px 16px; }
+.error strong { color: var(--nogo); }
+
+.docbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 14px; }
+.docbar .row { display: flex; flex-wrap: wrap; gap: 8px; }
+.doc-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
+@media (min-width: 1000px) { .doc-layout { grid-template-columns: 230px minmax(0, 1fr); align-items: start; } nav.toc { position: sticky; top: 16px; } }
+nav.toc { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px; min-width: 0; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc a { display: block; padding: 6px 10px; border-radius: 7px; color: var(--ink-2); text-decoration: none; font-size: 14px; }
+nav.toc a:hover, nav.toc a.active { background: var(--accent-soft); color: var(--ink); }
+@media (max-width: 999px) {
+  nav.toc { position: sticky; top: 0; z-index: 5; padding: 6px; border-radius: 10px; }
+  nav.toc ol { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
+  nav.toc a { white-space: nowrap; font-size: 13px; }
+}
+article.doc { padding: 28px clamp(18px, 4vw, 44px); }
+.doc h2 { font-family: var(--serif); font-size: 24px; margin: 0 0 12px; letter-spacing: -.005em; }
+.doc h3 { font-size: 15px; margin: 16px 0 6px; }
+.doc section { padding: 26px 0; border-top: 1px solid var(--line); scroll-margin-top: 70px; }
+.doc section:first-of-type { border-top: 0; padding-top: 0; }
+.doc p { margin: 0 0 10px; }
+.doc ul { margin: 0 0 10px; padding-left: 20px; }
+.doc li { margin-bottom: 5px; }
+.doc-title { font-family: var(--serif); font-size: clamp(26px, 3.6vw, 34px); line-height: 1.2; margin: 0 0 6px; }
+.doc-sub { color: var(--ink-2); margin: 0 0 6px; font-size: 17px; }
+.doc-meta { color: var(--muted); font-size: 13px; margin: 0 0 22px; }
+.verdict { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; padding: 5px 12px; border-radius: 999px; }
+.v-go { background: var(--go-soft); color: var(--go); }
+.v-test { background: var(--test-soft); color: var(--test); }
+.v-nogo { background: var(--nogo-soft); color: var(--nogo); }
+.callout { background: var(--soft); border-left: 3px solid var(--accent); border-radius: 0 10px 10px 0; padding: 10px 14px; margin: 10px 0; font-size: 15px; }
+.assume { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--test); background: var(--test-soft); padding: 1px 7px; border-radius: 5px; margin-right: 6px; vertical-align: 1px; }
+.tbl-wrap { overflow-x: auto; margin: 6px 0 12px; border: 1px solid var(--line); border-radius: 10px; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { background: var(--soft); font-weight: 600; font-size: 13px; }
+tr:last-child td { border-bottom: 0; }
+@media screen and (max-width: 640px) {
+  .tbl-wrap { border: 0; overflow: visible; }
+  .tbl-wrap table, .tbl-wrap tbody, .tbl-wrap tr, .tbl-wrap td { display: block; width: 100%; }
+  .tbl-wrap thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+  .tbl-wrap tr { border: 1px solid var(--line); border-radius: 10px; margin-bottom: 10px; padding: 4px 0; }
+  .tbl-wrap td { border-bottom: 0; padding: 5px 12px; }
+  .tbl-wrap td::before { content: attr(data-label); display: block; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+  .tbl-wrap td:first-child { font-weight: 600; }
+}
+.tier { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; }
+.tier .k { font-weight: 700; color: var(--accent); margin-right: 6px; }
+.formula { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; background: var(--soft); padding: 6px 9px; border-radius: 7px; display: block; margin: 6px 0; overflow-wrap: anywhere; }
+.pill { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--soft); white-space: nowrap; }
+.pill.high { background: var(--nogo-soft); color: var(--nogo); }
+.pill.medium { background: var(--test-soft); color: var(--test); }
+.pill.low { background: var(--go-soft); color: var(--go); }
+.pill.strong { background: var(--go-soft); color: var(--go); }
+.pill.weak { background: var(--nogo-soft); color: var(--nogo); }
+.phases { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+@media (min-width: 760px) { .phases { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.phase { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+.phase h3 { margin-top: 0; }
+.disclaimer { font-size: 13px; color: var(--muted); margin-top: 18px; }
+.raw { overflow-wrap: anywhere; }
+.toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 8px 14px; border-radius: 9px; font-size: 14px; opacity: 0; transition: opacity .2s; pointer-events: none; }
+.toast.show { opacity: 1; }
+footer { border-top: 1px solid var(--line); padding: 20px 0 36px; color: var(--muted); font-size: 14px; }
+footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 20px; }
+
+@media print {
+  :root { --bg: #fff; --card: #fff; --ink: #000; --ink-2: #222; --muted: #555; --line: #ccc; --soft: #f3f3f3; color-scheme: light; }
+  body { background: #fff; font-size: 11pt; }
+  header.site, #inputCard, nav.toc, .docbar, footer, .toast, .no-print { display: none !important; }
+  main { padding: 0; }
+  .wrap { max-width: none; padding: 0; }
+  .doc-layout { display: block; }
+  .card { box-shadow: none; border: 0; padding: 0; }
+  article.doc { padding: 0; }
+  .doc section { break-inside: auto; padding: 14pt 0; }
+  .doc h2, .doc h3 { break-after: avoid; }
+  .tier, .phase, tr { break-inside: avoid; }
+  .tbl-wrap { overflow: visible; border: 0; }
+  a { color: #000; text-decoration: none; }
+  @page { margin: 18mm 16mm; }
+}
+</style>
+</head>
+<body>
+<header class="site">
+  <div class="wrap">
+    <div class="eyebrow">AI Business Case Generator</div>
+    <h1>From product idea to structured business case.</h1>
+    <p class="lede">Describe the idea and who it is for. Get a clear, honest case with labeled assumptions, a sizing method instead of made-up numbers, and a go, test-first, or no-go recommendation.</p>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <form class="card" id="inputCard" novalidate>
+      <details class="key" id="keyBox">
+        <summary><span>Anthropic API key</span><span class="keystate" id="keyState">Not set</span></summary>
+        <label for="key" class="sr-only">Anthropic API key</label>
+        <div class="keyrow">
+          <input type="password" id="key" placeholder="sk-ant-..." autocomplete="off" spellcheck="false">
+          <button type="button" id="saveKey">Save</button>
+          <button type="button" id="forgetKey">Forget</button>
+        </div>
+        <p class="small-note">Your key stays in this browser and is sent only to api.anthropic.com. Get one at <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com/settings/keys</a>.</p>
+      </details>
+
+      <div class="form-grid">
+        <div class="span-2">
+          <label for="idea">Product idea</label>
+          <textarea id="idea" placeholder="What is it, in a few sentences?" required></textarea>
+        </div>
+        <div>
+          <label for="customer">Target customer</label>
+          <textarea id="customer" placeholder="Who buys it and who uses it?"></textarea>
+        </div>
+        <div>
+          <label for="problem">Problem it solves</label>
+          <textarea id="problem" placeholder="What hurts today, and how do people cope?"></textarea>
+        </div>
+        <div>
+          <label for="industry">Industry</label>
+          <input type="text" id="industry" placeholder="e.g. Hospitality, B2B SaaS, Healthcare">
+        </div>
+        <fieldset>
+          <legend>Company stage</legend>
+          <div class="seg" role="radiogroup">
+            <label><input type="radio" name="stage" value="idea" checked><span>Idea</span></label>
+            <label><input type="radio" name="stage" value="startup"><span>Startup</span></label>
+            <label><input type="radio" name="stage" value="enterprise"><span>Enterprise</span></label>
+          </div>
+        </fieldset>
+        <div class="span-2 nums">
+          <div>
+            <label for="team">Team size <span class="opt">(optional)</span></label>
+            <input type="text" id="team" placeholder="e.g. 2 founders, 1 contractor">
+          </div>
+          <div>
+            <label for="budget">Budget range <span class="opt">(optional, in your own words)</span></label>
+            <input type="text" id="budget" placeholder="e.g. bootstrapped, a small seed round">
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="primary" id="go">Generate business case</button>
+        <button type="button" id="sample">Load sample idea</button>
+        <button type="button" id="reset">Clear</button>
+      </div>
+      <p class="status" id="status" role="status" aria-live="polite"></p>
+    </form>
+
+    <div id="output" aria-live="polite">
+      <div class="card empty" id="empty">
+        <h2>Your business case will appear here</h2>
+        <p>Eleven sections, each with assumptions labeled so you know what to verify.</p>
+        <ul class="chips-list">
+          <li>Executive summary</li><li>Problem and opportunity</li><li>Solution</li><li>Market sizing method</li><li>Competitive landscape</li><li>Business models</li><li>Costs and resources</li><li>Risks</li><li>KPIs</li><li>90-day plan</li><li>Recommendation</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Built by <a href="https://github.com/emresenturer">Emre Senturer</a></span>
+    <span><a href="https://github.com/emresenturer/ai-business-case-generator">Source on GitHub</a> · A thinking aid, not financial or legal advice.</span>
+  </div>
+</footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  'use strict';
+  var KEY_NAME = 'ai-business-case-generator_anthropic_key';
+  var $ = function (id) { return document.getElementById(id); };
+  var form = $('inputCard'), output = $('output'), statusEl = $('status'), goBtn = $('go');
+  var keyInput = $('key'), keyState = $('keyState'), keyBox = $('keyBox');
+  var emptyNode = $('empty');
+  var current = null;
+
+  var SAMPLE = {
+    idea: 'A shift-swap and last-minute cover app for independent restaurants. Staff post shifts they cannot work, qualified coworkers claim them, and the manager approves with one tap. It plugs into the schedule the restaurant already uses (spreadsheet or common scheduling tools).',
+    customer: 'Owners and general managers of independent restaurants and small groups (1 to 10 locations) with 15 to 80 hourly staff. Users are servers, line cooks, and hosts.',
+    problem: 'Call-outs and swaps are handled in chaotic group chats. Managers spend hours a week finding cover, shifts go unfilled, and service suffers. Existing scheduling suites are built for chains and feel heavy for a single restaurant.',
+    industry: 'Hospitality / restaurant operations software',
+    stage: 'idea',
+    team: '2 co-founders (one ex-restaurant manager, one engineer)',
+    budget: 'Bootstrapped for the first 6 months, maybe a small angel round later'
+  };
+
+  var SYSTEM_PROMPT = [
+    'You are a rigorous product strategist who writes business cases for founders and product teams. You are candid: a good business case can conclude "test first" or "no-go".',
+    '',
+    'Honesty rules (most important):',
+    '- Never present invented facts as data. Do not state market sizes, growth rates, survey results, or statistics as if they were sourced. You have no live data.',
+    '- For market sizing, give the METHOD: a bottom-up formula (e.g. number of target accounts x adoption rate x annual value per account), with every input written as a clearly labeled assumption the user must verify. Use illustrative placeholder inputs only when labeled as assumptions, and say where to find real numbers (public statistics bodies, industry associations, customer interviews).',
+    '- For competitors, describe categories and the kind of player in each. If you mention example company names, they must be widely known, and you must tell the user to verify them because the landscape changes.',
+    '- Costs are ranges with assumptions, in plain terms tied to the user\'s stated team and budget. Adapt to the stage (idea, startup, enterprise).',
+    '- Do not use em-dashes. Use commas, periods, colons, or parentheses.',
+    '',
+    'Respond with ONLY a JSON object, no prose and no code fences, in exactly this shape:',
+    '{',
+    '  "title": "short name for the product",',
+    '  "one_liner": "one sentence value proposition",',
+    '  "executive_summary": "4-6 sentence paragraph",',
+    '  "problem_opportunity": { "problem": "", "who_feels_it": "", "current_alternatives": "", "why_now": "", "evidence_to_gather": [""] },',
+    '  "solution": { "description": "", "key_capabilities": [""], "differentiation": "", "mvp_scope": "" },',
+    '  "market": {',
+    '    "approach": "1-2 sentences on the sizing approach",',
+    '    "tam": { "definition": "", "formula": "", "assumptions": [""] },',
+    '    "sam": { "definition": "", "formula": "", "assumptions": [""] },',
+    '    "som": { "definition": "", "formula": "", "assumptions": [""] },',
+    '    "where_to_find_data": [""]',
+    '  },',
+    '  "competition": { "categories": [ { "category": "", "examples": [""], "strengths": "", "gap": "" } ], "positioning": "", "verify_note": "" },',
+    '  "business_models": [ { "model": "", "how_it_works": "", "pros": "", "cons": "", "fit": "strong|medium|weak" } ],',
+    '  "costs": { "items": [ { "item": "", "range": "", "assumption": "" } ], "team_plan": "", "assumptions": [""] },',
+    '  "risks": [ { "risk": "", "likelihood": "low|medium|high", "impact": "low|medium|high", "mitigation": "" } ],',
+    '  "kpis": [ { "kpi": "", "target": "", "why": "" } ],',
+    '  "plan_90_days": [ { "phase": "Days 1-30", "focus": "", "actions": [""], "exit_criteria": "" } ],',
+    '  "recommendation": { "verdict": "go|test_first|no_go", "headline": "", "reasons": [""], "conditions": [""] }',
+    '}',
+    'Sizes: 3-5 items per list unless noted. business_models: 2-4. risks: 4-6. kpis: 4-6. plan_90_days: exactly 3 phases (Days 1-30, 31-60, 61-90). KPI targets for early stages should be framed as hypotheses to validate.'
+  ].join('\n');
+
+  var SECTIONS = [
+    ['exec', 'Executive summary'], ['problem', 'Problem and opportunity'], ['solution', 'Solution'],
+    ['market', 'Target market and sizing'], ['competition', 'Competitive landscape'], ['models', 'Business model options'],
+    ['costs', 'Cost and resource estimate'], ['risks', 'Risks and mitigations'], ['kpis', 'KPIs'],
+    ['plan', '90-day plan'], ['rec', 'Recommendation']
+  ];
+  var VERDICT = { go: ['Go', 'v-go'], test_first: ['Test first', 'v-test'], no_go: ['No-go', 'v-nogo'] };
+
+  // ---------- key ----------
+  function getKey() { try { return localStorage.getItem(KEY_NAME) || ''; } catch (e) { return ''; } }
+  function refreshKey() {
+    var k = getKey();
+    keyState.textContent = k ? 'Saved in this browser' : 'Not set';
+    keyState.classList.toggle('on', !!k);
+    keyInput.value = '';
+    keyInput.placeholder = k ? 'Saved. Paste a new key to replace.' : 'sk-ant-...';
+    if (!k) keyBox.open = true;
+  }
+  $('saveKey').addEventListener('click', function () {
+    var v = keyInput.value.trim();
+    if (!v) { toast('Paste a key first'); keyInput.focus(); return; }
+    try { localStorage.setItem(KEY_NAME, v); } catch (e) { toast('Could not save the key'); return; }
+    refreshKey(); toast('Key saved in this browser');
+  });
+  $('forgetKey').addEventListener('click', function () { try { localStorage.removeItem(KEY_NAME); } catch (e) {} refreshKey(); toast('Key removed'); });
+
+  // ---------- helpers ----------
+  function el(tag, attrs, kids) {
+    var n = document.createElement(tag);
+    if (attrs) for (var a in attrs) {
+      if (a === 'text') n.textContent = attrs[a];
+      else if (a === 'class') n.className = attrs[a];
+      else n.setAttribute(a, attrs[a]);
+    }
+    (kids || []).forEach(function (c) { if (c !== null && c !== undefined && c !== false) n.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+    return n;
+  }
+  function s(v) { return (v === null || v === undefined) ? '' : String(v); }
+  function A(v) { return Array.isArray(v) ? v.filter(function (x) { return x !== null && x !== undefined && x !== ''; }) : (v ? [v] : []); }
+  function O(v) { return (v && typeof v === 'object') ? v : {}; }
+  function toast(m) { var t = $('toast'); t.textContent = m; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(function () { t.classList.remove('show'); }, 1800); }
+  function esc(x) { return s(x).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+  function miniMd(text) {
+    var out = '', inList = false;
+    esc(text).split(/\r?\n/).forEach(function (line) {
+      var b = function (z) { return z.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>'); }, m;
+      if ((m = line.match(/^\s*[-*]\s+(.*)$/))) { if (!inList) { out += '<ul>'; inList = true; } out += '<li>' + b(m[1]) + '</li>'; return; }
+      if (inList) { out += '</ul>'; inList = false; }
+      if ((m = line.match(/^(#{1,6})\s+(.*)$/))) { out += '<h3>' + b(m[2]) + '</h3>'; return; }
+      if (line.trim()) out += '<p>' + b(line) + '</p>';
+    });
+    return out + (inList ? '</ul>' : '');
+  }
+  function parseJson(text) {
+    var t = s(text).trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '');
+    try { return JSON.parse(t); } catch (e) {}
+    var a = t.indexOf('{'), z = t.lastIndexOf('}');
+    if (a !== -1 && z > a) { try { return JSON.parse(t.slice(a, z + 1)); } catch (e) {} }
+    return null;
+  }
+  function copyText(text) {
+    var ok = function () { toast('Copied to clipboard'); };
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(ok, function () { fallbackCopy(text); ok(); });
+    else { fallbackCopy(text); ok(); }
+  }
+  function fallbackCopy(text) { var ta = el('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch (e) {} ta.remove(); }
+  function slug(x) { return s(x).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) || 'business-case'; }
+  function download(text, name) {
+    var url = URL.createObjectURL(new Blob([text], { type: 'text/markdown;charset=utf-8' }));
+    var a = el('a', { href: url, download: name }); document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+  function btn(label, fn, cls) { var b = el('button', { type: 'button', text: label }); if (cls) b.className = cls; b.addEventListener('click', fn); return b; }
+  function para(t) { return t ? el('p', { text: s(t) }) : null; }
+  function ul(items, assume) { var l = el('ul'); A(items).forEach(function (i) { l.appendChild(el('li', null, [assume ? el('span', { class: 'assume', text: 'Assumption' }) : null, s(i)])); }); return l; }
+  function labeled(label, text) { return text ? el('p', null, [el('strong', { text: label + ': ' }), s(text)]) : null; }
+  function table(headers, rows) {
+    var t = el('table'), thead = el('thead'), tr = el('tr');
+    headers.forEach(function (h) { tr.appendChild(el('th', { scope: 'col', text: h })); });
+    thead.appendChild(tr); t.appendChild(thead);
+    var tb = el('tbody');
+    rows.forEach(function (r) { var row = el('tr'); r.forEach(function (c, i) { var td = c && c.nodeType ? el('td', null, [c]) : el('td', { text: s(c) }); td.setAttribute('data-label', headers[i]); row.appendChild(td); }); tb.appendChild(row); });
+    t.appendChild(tb);
+    return el('div', { class: 'tbl-wrap' }, [t]);
+  }
+  function pill(v) { var x = s(v).toLowerCase(); return el('span', { class: 'pill ' + x, text: x || 'n/a' }); }
+
+  // ---------- states ----------
+  function showEmpty() { output.innerHTML = ''; output.appendChild(emptyNode); }
+  function showLoading() {
+    output.innerHTML = '';
+    output.appendChild(el('div', { class: 'card loading' }, [el('div', { class: 'spinner', 'aria-hidden': 'true' }), el('p', { text: 'Drafting your business case.' }), el('p', { class: 'small-note', text: 'A full case usually takes 30 to 90 seconds.' })]));
+  }
+  function showError(title, detail) {
+    output.innerHTML = '';
+    output.appendChild(el('div', { class: 'error', role: 'alert' }, [el('strong', { text: title }), detail ? el('p', { text: detail, style: 'margin:6px 0 0' }) : null]));
+  }
+
+  // ---------- render ----------
+  function render(d, inputs, truncated) {
+    current = { data: d, inputs: inputs };
+    output.innerHTML = '';
+    var title = s(d.title) || 'Business case';
+
+    var bar = el('div', { class: 'docbar' }, [
+      el('strong', { text: 'Business case ready' }),
+      el('div', { class: 'row' }, [
+        btn('Copy Markdown', function () { copyText(toMarkdown(d, inputs)); }),
+        btn('Download .md', function () { download(toMarkdown(d, inputs), slug(title) + '-business-case.md'); }),
+        btn('Print / PDF', function () { window.print(); })
+      ])
+    ]);
+    output.appendChild(bar);
+    if (truncated) output.appendChild(el('div', { class: 'error', style: 'margin-bottom:14px' }, [el('strong', { text: 'The response was cut off. ' }), 'Some sections may be incomplete. Try a shorter description or generate again.']));
+
+    var nav = el('nav', { class: 'toc', 'aria-label': 'Sections' }), ol = el('ol');
+    SECTIONS.forEach(function (sc) { ol.appendChild(el('li', null, [el('a', { href: '#sec-' + sc[0], text: sc[1] })])); });
+    nav.appendChild(ol);
+
+    var doc = el('article', { class: 'card doc' });
+    doc.appendChild(el('h1', { class: 'doc-title', text: title }));
+    if (d.one_liner) doc.appendChild(el('p', { class: 'doc-sub', text: s(d.one_liner) }));
+    doc.appendChild(el('p', { class: 'doc-meta', text: 'Stage: ' + inputs.stageLabel + (inputs.industry ? ' · Industry: ' + inputs.industry : '') + ' · Generated ' + new Date().toLocaleDateString() }));
+
+    var rec = O(d.recommendation), v = VERDICT[s(rec.verdict)] || null;
+
+    add(doc, 'exec', [
+      v ? el('p', null, [el('span', { class: 'verdict ' + v[1], text: 'Recommendation: ' + v[0] })]) : null,
+      para(d.executive_summary)
+    ]);
+
+    var p = O(d.problem_opportunity);
+    add(doc, 'problem', [para(p.problem), labeled('Who feels it', p.who_feels_it), labeled('Current alternatives', p.current_alternatives), labeled('Why now', p.why_now),
+      A(p.evidence_to_gather).length ? el('h3', { text: 'Evidence to gather' }) : null, A(p.evidence_to_gather).length ? ul(p.evidence_to_gather) : null]);
+
+    var so = O(d.solution);
+    add(doc, 'solution', [para(so.description), A(so.key_capabilities).length ? el('h3', { text: 'Key capabilities' }) : null, ul(so.key_capabilities),
+      labeled('Differentiation', so.differentiation), labeled('MVP scope', so.mvp_scope)]);
+
+    var m = O(d.market);
+    var tiers = [['tam', 'TAM', 'Total addressable market'], ['sam', 'SAM', 'Serviceable addressable market'], ['som', 'SOM', 'Serviceable obtainable market']].map(function (t) {
+      var x = O(m[t[0]]);
+      return el('div', { class: 'tier' }, [
+        el('p', { style: 'margin:0 0 4px' }, [el('span', { class: 'k', text: t[1] }), el('span', { text: t[2] })]),
+        para(x.definition),
+        x.formula ? el('code', { class: 'formula', text: s(x.formula) }) : null,
+        ul(x.assumptions, true)
+      ]);
+    });
+    add(doc, 'market', [
+      el('div', { class: 'callout', text: 'This is a sizing method, not sourced data. Every input below is an assumption to replace with real numbers before you rely on it.' }),
+      para(m.approach)
+    ].concat(tiers).concat([A(m.where_to_find_data).length ? el('h3', { text: 'Where to find real numbers' }) : null, ul(m.where_to_find_data)]));
+
+    var c = O(d.competition);
+    add(doc, 'competition', [
+      table(['Category', 'Examples', 'Strengths', 'Gap to exploit'], A(c.categories).map(function (r) { r = O(r); return [s(r.category), A(r.examples).join(', '), s(r.strengths), s(r.gap)]; })),
+      labeled('Positioning', c.positioning),
+      el('div', { class: 'callout', text: s(c.verify_note) || 'Verify every company name and claim here. Competitive landscapes change quickly and the model has no live data.' })
+    ]);
+
+    add(doc, 'models', [table(['Model', 'How it works', 'Pros', 'Cons', 'Fit'], A(d.business_models).map(function (r) { r = O(r); return [s(r.model), s(r.how_it_works), s(r.pros), s(r.cons), pill(r.fit)]; }))]);
+
+    var co = O(d.costs);
+    add(doc, 'costs', [
+      table(['Item', 'Estimated range', 'Assumption'], A(co.items).map(function (r) { r = O(r); return [s(r.item), s(r.range), el('span', null, [el('span', { class: 'assume', text: 'Assumption' }), s(r.assumption)])]; })),
+      labeled('Team plan', co.team_plan),
+      A(co.assumptions).length ? el('h3', { text: 'Assumptions behind these ranges' }) : null, ul(co.assumptions, true)
+    ]);
+
+    add(doc, 'risks', [table(['Risk', 'Likelihood', 'Impact', 'Mitigation'], A(d.risks).map(function (r) { r = O(r); return [s(r.risk), pill(r.likelihood), pill(r.impact), s(r.mitigation)]; }))]);
+
+    add(doc, 'kpis', [table(['KPI', 'Target or hypothesis', 'Why it matters'], A(d.kpis).map(function (r) { r = O(r); return [s(r.kpi), s(r.target), s(r.why)]; }))]);
+
+    var phases = el('div', { class: 'phases' });
+    A(d.plan_90_days).forEach(function (ph) { ph = O(ph); phases.appendChild(el('div', { class: 'phase' }, [el('h3', { text: s(ph.phase) }), para(ph.focus), ul(ph.actions), labeled('Exit criteria', ph.exit_criteria)])); });
+    add(doc, 'plan', [phases]);
+
+    add(doc, 'rec', [
+      v ? el('p', null, [el('span', { class: 'verdict ' + v[1], text: v[0] })]) : null,
+      rec.headline ? el('p', null, [el('strong', { text: s(rec.headline) })]) : null,
+      A(rec.reasons).length ? el('h3', { text: 'Reasons' }) : null, ul(rec.reasons),
+      A(rec.conditions).length ? el('h3', { text: 'Conditions to proceed' }) : null, ul(rec.conditions)
+    ]);
+
+    doc.appendChild(el('p', { class: 'disclaimer', text: 'Generated by AI from your inputs. Figures are ranges and assumptions, not sourced facts. Validate with customers and real data before making decisions.' }));
+
+    output.appendChild(el('div', { class: 'doc-layout' }, [nav, doc]));
+    setupActiveNav(nav);
+    output.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  function add(doc, id, kids) {
+    var label = SECTIONS.filter(function (x) { return x[0] === id; })[0][1];
+    doc.appendChild(el('section', { id: 'sec-' + id, 'aria-labelledby': 'h-' + id }, [el('h2', { id: 'h-' + id, text: label })].concat(kids)));
+  }
+  function setupActiveNav(nav) {
+    if (!('IntersectionObserver' in window)) return;
+    var links = nav.querySelectorAll('a');
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        links.forEach(function (a) {
+          var on = a.getAttribute('href') === '#' + e.target.id;
+          a.classList.toggle('active', on);
+          if (on && window.innerWidth < 1000) { var ol = a.closest('ol'); ol.scrollLeft = a.offsetLeft - 16; }
+        });
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    document.querySelectorAll('.doc section').forEach(function (sec) { io.observe(sec); });
+  }
+
+  function renderRaw(text, note) {
+    current = { raw: text };
+    output.innerHTML = '';
+    output.appendChild(el('div', { class: 'docbar' }, [el('strong', { text: note }), el('div', { class: 'row' }, [btn('Copy', function () { copyText(text); }), btn('Download .md', function () { download(text, 'business-case.md'); }), btn('Print / PDF', function () { window.print(); })])]));
+    var art = el('article', { class: 'card doc raw' }); art.innerHTML = miniMd(text); // escaped inside miniMd
+    output.appendChild(art);
+  }
+
+  function toMarkdown(d, inputs) {
+    var L = [], push = function () { for (var i = 0; i < arguments.length; i++) L.push(arguments[i]); };
+    var list = function (items, pre) { A(items).forEach(function (i) { push('- ' + (pre || '') + s(i)); }); push(''); };
+    var row = function (cells) { return '| ' + cells.map(function (c) { return s(c).replace(/\|/g, '\\|').replace(/\n/g, ' '); }).join(' | ') + ' |'; };
+    var tbl = function (h, rows) { push(row(h), row(h.map(function () { return '---'; }))); rows.forEach(function (r) { push(row(r)); }); push(''); };
+    var rec = O(d.recommendation), v = VERDICT[s(rec.verdict)];
+    push('# ' + (s(d.title) || 'Business case'), '');
+    if (d.one_liner) push('_' + s(d.one_liner) + '_', '');
+    push('Stage: ' + inputs.stageLabel + (inputs.industry ? ' | Industry: ' + inputs.industry : ''), '');
+    push('## Executive summary', '');
+    if (v) push('**Recommendation: ' + v[0] + '**', '');
+    push(s(d.executive_summary), '');
+    var p = O(d.problem_opportunity);
+    push('## Problem and opportunity', '', s(p.problem), '', '**Who feels it:** ' + s(p.who_feels_it), '', '**Current alternatives:** ' + s(p.current_alternatives), '', '**Why now:** ' + s(p.why_now), '', '**Evidence to gather:**', ''); list(p.evidence_to_gather);
+    var so = O(d.solution);
+    push('## Solution', '', s(so.description), '', '**Key capabilities:**', ''); list(so.key_capabilities);
+    push('**Differentiation:** ' + s(so.differentiation), '', '**MVP scope:** ' + s(so.mvp_scope), '');
+    var m = O(d.market);
+    push('## Target market and sizing', '', '> This is a sizing method, not sourced data. Every input is an assumption to verify.', '', s(m.approach), '');
+    ['tam', 'sam', 'som'].forEach(function (k) { var x = O(m[k]); push('### ' + k.toUpperCase(), '', s(x.definition), '', '`' + s(x.formula) + '`', ''); list(x.assumptions, 'Assumption: '); });
+    push('**Where to find real numbers:**', ''); list(m.where_to_find_data);
+    var c = O(d.competition);
+    push('## Competitive landscape', '');
+    tbl(['Category', 'Examples', 'Strengths', 'Gap'], A(c.categories).map(function (r) { r = O(r); return [r.category, A(r.examples).join(', '), r.strengths, r.gap]; }));
+    push('**Positioning:** ' + s(c.positioning), '', '> ' + (s(c.verify_note) || 'Verify every company name and claim.'), '');
+    push('## Business model options', '');
+    tbl(['Model', 'How it works', 'Pros', 'Cons', 'Fit'], A(d.business_models).map(function (r) { r = O(r); return [r.model, r.how_it_works, r.pros, r.cons, r.fit]; }));
+    var co = O(d.costs);
+    push('## Cost and resource estimate', '');
+    tbl(['Item', 'Range', 'Assumption'], A(co.items).map(function (r) { r = O(r); return [r.item, r.range, r.assumption]; }));
+    push('**Team plan:** ' + s(co.team_plan), '', '**Assumptions:**', ''); list(co.assumptions, 'Assumption: ');
+    push('## Risks and mitigations', '');
+    tbl(['Risk', 'Likelihood', 'Impact', 'Mitigation'], A(d.risks).map(function (r) { r = O(r); return [r.risk, r.likelihood, r.impact, r.mitigation]; }));
+    push('## KPIs', '');
+    tbl(['KPI', 'Target', 'Why'], A(d.kpis).map(function (r) { r = O(r); return [r.kpi, r.target, r.why]; }));
+    push('## 90-day plan', '');
+    A(d.plan_90_days).forEach(function (ph) { ph = O(ph); push('### ' + s(ph.phase), '', s(ph.focus), ''); list(ph.actions); push('**Exit criteria:** ' + s(ph.exit_criteria), ''); });
+    push('## Recommendation', '', '**' + (v ? v[0] : s(rec.verdict)) + ':** ' + s(rec.headline), '', '**Reasons:**', ''); list(rec.reasons);
+    push('**Conditions to proceed:**', ''); list(rec.conditions);
+    push('---', '', '_Generated by AI. Figures are ranges and assumptions, not sourced facts._', '');
+    return L.join('\n');
+  }
+
+  // ---------- API ----------
+  function stageVal() { var r = form.querySelector('input[name=stage]:checked'); return r ? r.value : 'idea'; }
+  async function generate(e) {
+    e.preventDefault();
+    var inputs = {
+      idea: $('idea').value.trim(), customer: $('customer').value.trim(), problem: $('problem').value.trim(),
+      industry: $('industry').value.trim(), stage: stageVal(), team: $('team').value.trim(), budget: $('budget').value.trim()
+    };
+    inputs.stageLabel = { idea: 'Idea', startup: 'Startup', enterprise: 'Enterprise' }[inputs.stage];
+    if (!inputs.idea) { statusEl.textContent = 'Describe the product idea first.'; $('idea').focus(); return; }
+    var key = getKey() || keyInput.value.trim();
+    if (!key) { statusEl.textContent = 'Add your Anthropic API key first. It stays in this browser.'; keyBox.open = true; keyInput.focus(); return; }
+    if (!getKey()) { try { localStorage.setItem(KEY_NAME, key); } catch (x) {} refreshKey(); }
+    statusEl.textContent = '';
+
+    var userText = [
+      'Product idea: ' + inputs.idea,
+      'Target customer: ' + (inputs.customer || '(not given, infer cautiously and say so)'),
+      'Problem: ' + (inputs.problem || '(not given, infer cautiously and say so)'),
+      'Industry: ' + (inputs.industry || '(not given)'),
+      'Company stage: ' + inputs.stageLabel,
+      'Team size: ' + (inputs.team || '(not given)'),
+      'Budget range (user\'s words): ' + (inputs.budget || '(not given)')
+    ].join('\n');
+
+    goBtn.disabled = true; goBtn.textContent = 'Generating...';
+    showLoading();
+    try {
+      var res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-api-key': key,
+          'anthropic-version': '2023-06-01',
+          'anthropic-beta': 'server-side-fallback-2026-07-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-opus-5-5',
+          max_tokens: 16000,
+          output_config: { effort: 'medium' },
+          fallbacks: 'default',
+          system: SYSTEM_PROMPT,
+          messages: [{ role: 'user', content: userText }]
+        })
+      });
+      if (!res.ok) {
+        var msg = 'Request failed (' + res.status + ').';
+        try { var err = await res.json(); if (err && err.error && err.error.message) msg = err.error.message; } catch (x) {}
+        showError('The API returned an error.', msg); return;
+      }
+      var data = await res.json();
+      if (data.stop_reason === 'refusal') { showError('The model declined this request.', 'Try rewording the idea or removing unnecessary detail.'); return; }
+      var txt = (data.content || []).filter(function (b) { return b.type === 'text'; }).map(function (b) { return b.text; }).join('');
+      var truncated = data.stop_reason === 'max_tokens';
+      var parsed = parseJson(txt);
+      if (parsed && typeof parsed === 'object') render(parsed, inputs, truncated);
+      else if (txt.trim()) renderRaw(txt, truncated ? 'Cut off before finishing. Partial text below.' : 'Could not read the structured answer. Raw text below.');
+      else showError('The model returned an empty answer.', 'Try again in a moment.');
+    } catch (err) {
+      showError('Could not reach api.anthropic.com.', 'Check your connection and try again. (' + (err && err.message ? err.message : 'network error') + ')');
+    } finally {
+      goBtn.disabled = false; goBtn.textContent = 'Generate business case';
+    }
+  }
+
+  form.addEventListener('submit', generate);
+  $('sample').addEventListener('click', function () {
+    ['idea', 'customer', 'problem', 'industry', 'team', 'budget'].forEach(function (k) { $(k).value = SAMPLE[k]; });
+    var r = form.querySelector('input[name=stage][value=' + SAMPLE.stage + ']'); if (r) r.checked = true;
+    statusEl.textContent = 'Sample loaded. Press "Generate business case".';
+  });
+  $('reset').addEventListener('click', function () {
+    ['idea', 'customer', 'problem', 'industry', 'team', 'budget'].forEach(function (k) { $(k).value = ''; });
+    form.querySelector('input[name=stage][value=idea]').checked = true;
+    current = null; showEmpty(); statusEl.textContent = 'Cleared.';
+  });
+  refreshKey();
+})();
+</script>
+</body>
+</html>
